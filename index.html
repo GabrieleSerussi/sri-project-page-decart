@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Step-Wise Refusal Dynamics in Autoregressive and Diffusion Language Models | Decart Research</title>
-  <meta name="description" content="Diffusion language models revise harmful intermediate text before committing it. The paper isolates this recovery by switching the sampler under fixed weights, introduces SRI, a step-wise refusal signal read from hidden states, and builds SRI Guard, a jailbreak detector trained only on benign signals with 0.01 to 0.04% inference overhead. Decart.ai with the Technion, Ben-Gurion University and the University of Haifa.">
+  <meta name="description" content="Diffusion language models are markedly harder to jailbreak than comparable autoregressive models. This paper provides evidence that the difference is tied to the way they generate text, and turns that finding into SRI Guard, a jailbreak detector that matches or outperforms existing defenses at 0.01 to 0.04% overhead.">
   <meta name="keywords" content="diffusion language models, autoregressive, jailbreak, refusal, AI safety, LLaDA, Dream, LLaMA-3, Qwen, Gemma, SRI, SRI Guard, remasking, recovery by revision, Decart, Technion, Ben-Gurion University, EMNLP 2026">
   <meta name="author" content="Eliron Rahimi, Elad Hirshel, Rom Himelstein, Amit LeVi, Avi Mendelson, Chaim Baskin">
   <meta property="og:site_name" content="Decart Research">
   <meta property="og:title" content="Step-Wise Refusal Dynamics in Autoregressive and Diffusion Language Models">
-  <meta property="og:description" content="Why diffusion language models recover from harmful intermediate text, a step-wise internal signal (SRI) that reads it inside the model, and SRI Guard: jailbreak detection at 0.01 to 0.04% overhead.">
+  <meta property="og:description" content="Diffusion language models are markedly harder to jailbreak than comparable autoregressive models. This paper provides evidence that the difference is tied to the way they generate text, and turns that finding into SRI Guard, a jailbreak detector that matches or outperforms existing defenses at 0.01 to 0.04% overhead.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gabrieleserussi.github.io/sri-project-page-decart/">
   <link rel="canonical" href="https://gabrieleserussi.github.io/sri-project-page-decart/">
@@ -50,7 +50,12 @@
         <span class="article-date">EMNLP 2026 · arXiv:2602.02600</span>
       </div>
       <h1 class="article-title">Step-Wise Refusal Dynamics in Autoregressive and Diffusion Language Models</h1>
-      <p class="article-lede"><strong>Diffusion language models</strong> are consistently more robust to jailbreak attacks than autoregressive models of comparable scale, and this paper ties the gap to the sampling mechanism. <span class="lede-more">An autoregressive model commits each token as soon as it is generated, so an early harmful token shapes the rest of the response. A diffusion model with remasking can still revise a harmful token before committing it, and the same weights become safer when autoregressive sampling is switched to diffusion remasking. To watch this process inside the model, the paper introduces <strong>SRI</strong>, a step-wise signal read from hidden states, and turns it into <strong>SRI Guard</strong>, a jailbreak detector trained only on harmless generations that adds 0.01 to 0.04% to generation time.</span></p>
+      <p class="article-dek">Diffusion language models are markedly harder to jailbreak than comparable autoregressive models. This paper provides evidence that the difference is tied to the way they generate text, and turns that finding into a jailbreak detector that costs almost nothing.</p>
+      <ul class="value-points" aria-label="What the paper delivers">
+        <li><span class="vp-label">Result</span><span class="vp-text">Jailbreaks succeed on 9 to 21% of prompts with the evaluated diffusion models, against 48 to 62% with comparable autoregressive models.</span></li>
+        <li><span class="vp-label">Why</span><span class="vp-text">A diffusion model can revise harmful text before committing it. An autoregressive model commits each token as it is generated.</span></li>
+        <li><span class="vp-label">Defense</span><span class="vp-text">SRI Guard catches jailbreaks from the model's hidden states. It matches or outperforms existing defenses at 0.01 to 0.04% overhead.</span></li>
+      </ul>
 
       <div class="authors" aria-label="Authors">
         <span class="author"><a href="https://openreview.net/profile?id=~Eliron_Rahimi1" target="_blank" rel="noopener">Eliron Rahimi</a><sup>1,2</sup></span>
@@ -61,7 +66,7 @@
         <span class="author is-decart"><a href="https://chaimbaskin.bgu.ac.il/" target="_blank" rel="noopener">Chaim Baskin</a><sup>2,4</sup> <span class="decart-chip" title="Decart.ai"><img src="assets/img/decart-all-blue-logo.svg" alt="">Decart</span></span>
       </div>
       <div class="affils">
-        <span class="affil"><sup>1</sup>Department of Computer Science, Technion Israel Institute of Technology</span>
+        <span class="affil"><sup>1</sup>Department of Computer Science, Technion, Israel Institute of Technology</span>
         <span class="affil"><sup>2</sup>INSIGHT Lab, School of Electrical and Computer Engineering, Ben-Gurion University of the Negev</span>
         <span class="affil"><sup>3</sup>Computer Science Department, University of Haifa</span>
         <span class="affil is-decart"><sup>4</sup><a href="https://research.decart.ai/" target="_blank" rel="noopener">Decart.ai</a>, Israel</span>
@@ -152,35 +157,35 @@
 <section class="home-section home-section--tight" id="tldr">
   <div class="tldr reveal">
     <div class="tldr-side">
-      <span class="eyebrow eyebrow-badge">Overview</span>
-      <h3>Diffusion remasking promotes recovery from harmful intermediate text, and switching to it improves jailbreak robustness even under fixed weights.</h3>
+      <span class="eyebrow eyebrow-badge">Overview · how it works</span>
+      <h3>A model that can revise before it commits is harder to jailbreak, and reading that revision inside the model catches jailbreaks at almost no cost.</h3>
     </div>
     <ul class="tldr-beats">
-      <li><span class="beat-label">Finding</span><strong>Diffusion models resist jailbreaks that succeed against autoregressive models of comparable scale.</strong> The advantage persists when the weights are held fixed and only the sampler changes, so sampling plays a substantial role beyond the weights.</li>
-      <li><span class="beat-label">Signal</span><strong>SRI reads the hidden states at every generation step and scores how far the generation leans toward compliance or refusal.</strong> It captures recovery that the text does not show, and it shows that recovery fails mostly under autoregressive sampling.</li>
-      <li><span class="beat-label">Guard</span><strong>Failed recoveries often look anomalous next to harmless generations in SRI space.</strong> SRI Guard, a small detector trained only on harmless signals, flags them, generalizes to unseen attacks and adds 0.01 to 0.04% to generation time.</li>
+      <li><span class="beat-label">Recovery</span><strong>An autoregressive model commits each token as it is generated.</strong> A diffusion model predicts every uncommitted position at each step and commits only some, so harmful predictions are often replaced before they are committed.</li>
+      <li><span class="beat-label">Signal</span><strong>SRI scores the hidden states at every step, from 1, compliant, to 0, refusal-aligned.</strong> It shows recoveries and failures that the text does not.</li>
+      <li><span class="beat-label">Guard</span><strong>Failed recoveries often look anomalous in SRI space.</strong> An autoencoder trained only on harmless signals flags them, with no jailbreak data and no change to the model.</li>
     </ul>
   </div>
   <div class="stats-grid">
     <div class="stat-card reveal">
       <span class="eyebrow eyebrow-badge">Jailbreak attack success</span>
       <div class="stat-value">48 to 62% <span class="arrow">→</span><br>9 to 21%</div>
-      <div class="stat-caption">Attack success over all jailbreaks, autoregressive models against diffusion models of comparable scale (Table 3).</div>
+      <div class="stat-caption">Attack success over all jailbreaks, evaluated autoregressive against diffusion models (Table 3).</div>
     </div>
     <div class="stat-card reveal">
       <span class="eyebrow eyebrow-badge">Harmful remasking rate</span>
       <div class="stat-value">0.81 to 0.96</div>
-      <div class="stat-caption">Share of harmful intermediate generations that remasking later revises (Table 1).</div>
+      <div class="stat-caption">Share of harmful intermediate text that remasking later revises (Table 1).</div>
     </div>
     <div class="stat-card reveal">
       <span class="eyebrow eyebrow-badge">SRI Guard overhead</span>
       <div class="stat-value">0.01 to 0.04%</div>
-      <div class="stat-caption">Added generation time; the paper puts it 150 to 300 times below external moderation and self-reflection defenses (Table 13).</div>
+      <div class="stat-caption">Added generation time. External moderation and self-reflection defenses cost 150 to 300 times more (Section 4.3).</div>
     </div>
     <div class="stat-card reveal">
       <span class="eyebrow eyebrow-badge">Jailbreak detection</span>
       <div class="stat-value">0.92 AUROC</div>
-      <div class="stat-caption">Mean over six models for the step-wise last-layer signal; a text-based signal reaches 0.57 (Table 4).</div>
+      <div class="stat-caption">Jailbreak detection with the step-wise signal, mean over six models. A text-based signal reaches 0.57 (Table 4).</div>
     </div>
   </div>
 </section>
@@ -193,8 +198,8 @@
     <div class="text-block reveal" id="results">
       <span class="eyebrow eyebrow-outline section-eyebrow">01 · Results</span>
       <h2>Jailbreak attacks succeed on <span class="accent">9 to 21%</span> of prompts with diffusion models and on 48 to 62% with comparable autoregressive models.</h2>
-      <p class="section-ref">Sections 2.3, 2.4 and 4.3 of the paper.</p>
-      <p>Three autoregressive models (LLaMA-3, Qwen-2.5, Gemma) and three diffusion models (LLaDA, LLaDA-1.5, Dream), all in the 7 to 8B range, answer 100 raw harmful prompts and 100 prompts for each of five jailbreak attacks. Attack Success Rate is the share of responses that an LLM judge marks as harmful, and Refusal Rate is the share of responses that refuse. Pick an attack and a metric to compare the six models.</p>
+      <p class="section-ref">Sections 2.1, 2.3, 2.4 and 4.3 of the paper, with Appendices B and C.3.</p>
+      <p>The paper compares six models in the 7 to 8B range: three autoregressive (LLaMA-3, Qwen-2.5, Gemma) and three diffusion (LLaDA, LLaDA-1.5, Dream). Each answers 100 plain harmful prompts and 100 prompts for each of five jailbreak attacks. An LLM judge scores attack success, and a refusal dictionary scores refusal. Pick an attack and a metric to compare the models.</p>
       <div class="chart-card">
               <div class="chart-head">
                 <div class="chart-title">Jailbreak robustness, autoregressive vs. diffusion<small>Table 3 · six models, five attacks</small></div>
@@ -229,7 +234,7 @@
       </div>
 
       <h3 class="deep">The same weights become safer when only the sampler changes.</h3>
-      <p class="deep">A gap between model families could still come from the weights. LLaDA and LLaDA-1.5 support autoregressive sampling as well as remasking, so the paper keeps their parameters fixed and switches only the sampler. Safety improves for both models, all five attacks and both metrics, and no value in Table 2 is negative.</p>
+      <p class="deep">The gap could still come from the weights. LLaDA and LLaDA-1.5 run under either sampler, so the paper switches the sampler and keeps the weights fixed. Safety improves across models, attacks and metrics, and no value in Table 2 is negative.</p>
       <div class="deep chart-card">
               <div class="chart-head">
                 <div class="chart-title">Improvement from switching AR sampling → diffusion remasking<small>Table 2 · percentage points, positive is safer</small></div>
@@ -242,7 +247,7 @@
               </div>
               <div class="legend" aria-hidden="true"><span><i style="background:var(--series-diffusion)"></i>LLaDA</span><span><i style="background:var(--series-ar)"></i>LLaDA-1.5</span></div>
               <div class="hbars" id="chartDelta"></div>
-              <p class="chart-note" id="deltaNote">Every value is non-negative; PAIR moves least and Refusal Suppression most in refusal rate. Greedy, random, static and dynamic remasking variants all improve on AR sampling (Appendix A), and an LLM judge confirms every refusal-rate gain (Table 15).</p>
+              <p class="chart-note" id="deltaNote">Every value is non-negative; PAIR moves least and Refusal Suppression most in refusal rate. Greedy, random, static and dynamic remasking variants all improve on AR sampling (Appendix A), and an LLM judge also finds higher refusal rates under diffusion sampling for every attack (Table 15).</p>
             </div>
       <div class="deep callout">
         <span class="eyebrow">What you learn</span>
@@ -250,7 +255,7 @@
       </div>
 
       <h3>SRI Guard matches or outperforms existing defenses at a fraction of their cost.</h3>
-      <p>The compared defenses, LlamaGuard 3, Self-Examine and perplexity filtering, run an extra model or an extra pass over the text. SRI Guard leaves sampling untouched and reads hidden states that the model computes anyway, so it adds 0.01 to 0.04% to generation time, which the paper puts 150 to 300 times below external moderation and self-reflection defenses. Averaged across the six models it has the highest refusal rate and the lowest attack success among the compared defenses, and its false-positive rate on harmless prompts averages 5%.</p>
+      <p>The compared defenses (LlamaGuard 3, Self-Examine, perplexity filtering) run an extra model or an extra pass over the text. SRI Guard reads the last-layer hidden states already produced during generation, so it adds only 0.01 to 0.04% to generation time. Averaged over the six models it has the highest refusal rate and the lowest attack success of the compared defenses, with a 5% false-positive rate on harmless prompts.</p>
       <div class="chart-card">
               <div class="chart-head">
                 <div class="chart-title">Defenses at a glance<small>Table 13 · mean over the six models · overhead on a log scale</small></div>
@@ -272,7 +277,7 @@
       <span class="eyebrow eyebrow-outline section-eyebrow">02 · Use it</span>
       <h2>Run SRI on your own model with the <span class="accent">released code</span>.</h2>
       <p class="section-ref">Code by the authors; the Colab notebook accompanies this page.</p>
-      <p>SRI needs a model whose last-layer hidden states you can read at every generation step, plus a harmless and a harmful prompt set to build the two anchors. The sri-signal repository wraps LLaDA and LLaMA-3, each with a runnable notebook, and a new model means subclassing <code>BaseWrapper</code> and implementing two methods. The Colab notebook runs the pipeline end to end on a small open model and draws the signal with the same animation as the cover.</p>
+      <p>You need a model whose last-layer hidden states you can read at every step, plus a harmless and a harmful prompt set for the anchors. The repository wraps LLaDA and LLaMA-3, each with a runnable notebook. A new model means subclassing <code>BaseWrapper</code> and implementing two methods. The Colab notebook runs the pipeline on a small open model and animates the signal like the cover.</p>
       <div class="paper-links build-actions">
               <a class="btn-pill is-primary" href="https://github.com/ElironRahimi/sri-signal" target="_blank" rel="noopener">
                 <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -332,13 +337,13 @@
       <span class="eyebrow eyebrow-outline section-eyebrow">03 · How it works</span>
       <h2>Remasking can revise a harmful token before it is committed, and SRI reads this process from the <span class="accent">hidden states</span>.</h2>
       <p class="section-ref">Sections 2.2 and 3 of the paper.</p>
-      <p>A model that has started a harmful answer under a jailbreak should still be able to stop. Autoregressive decoding commits each token as soon as it is generated, so an early harmful token cannot be revised and shapes the rest of the response. Remasking diffusion predicts every position at each step and commits only some of them, so a harmful prediction is often replaced before it is committed, and each committed harmless token makes harmful continuations less likely.</p>
+      <p>A model that has started a harmful answer should still be able to stop. Autoregressive decoding cannot revise: each token is committed as soon as it is generated, so an early harmful token shapes the rest of the response. Remasking diffusion predicts every uncommitted position at each step and commits only some of them. A harmful prediction is therefore often replaced before it is committed, and each committed harmless token makes harmful continuations less likely.</p>
       <div class="deep tokrow-block">
         <div class="tokrow"><span class="tokrow-label">Autoregressive sampling</span><span class="tok tok--harmful is-committed">Sure,</span><span class="tok tok--harmful is-committed">here</span><span class="tok tok--harmful is-committed">is</span><span class="tok tok--harmful is-committed">▇▇▇▇</span><span class="tokrow-arrow">→</span><span class="tok tok--harmful is-committed">▇▇▇</span><span class="tok tok--mask">░░░</span></div>
         <div class="tokrow"><span class="tokrow-label">Diffusion remasking</span><span class="tok tok--harmful">Sure,</span><span class="tok tok--harmful">▇▇▇▇</span><span class="tok tok--safe is-committed">sorry,</span><span class="tokrow-arrow">→</span><span class="tok tok--revising">I</span><span class="tok tok--safe is-committed">cannot</span></div>
         <p class="figure-caption">Solid pills are committed tokens and dashed pills are predictions that can still change. The diagram is a schematic; the cover animates the same mechanism step by step.</p>
       </div>
-      <p>To study this recovery, the paper needs to know at every step whether the generation leans toward compliance or refusal. The text alone cannot tell, because two generations can look identical on the surface while evolving very differently inside the model. SRI compares the last-layer activations at each step with the typical activations of harmless and of harmful generations and returns a score from 1, compliant, to 0, refusal-aligned; the <em>T</em> = 32 scores form the signal.</p>
+      <p>To study recovery, the paper needs to know at every step whether the generation leans toward compliance or refusal. The text cannot tell: two generations can look identical while evolving very differently inside the model. SRI compares the last-layer activations at each step with those of typical harmless and harmful generations. The result is a score from 1, compliant, to 0, refusal-aligned, and the <em>T</em> = 32 steps form the signal.</p>
       <div class="flow">
         <div class="flow-step"><span class="flow-num">1</span><h4>Anchor the space</h4><p>Mean last-layer activation of harmless and of harmful generations, stored for every step.</p></div>
         <span class="flow-arrow" aria-hidden="true">→</span>
@@ -358,10 +363,10 @@
     <div class="text-block reveal" id="details">
       <span class="eyebrow eyebrow-outline section-eyebrow">04 · Details</span>
       <h2>What makes the signal work, and where its <span class="accent">limits</span> are.</h2>
-      <p class="section-ref">Sections 2.2 and 4.2 to 4.4 of the paper, with Appendices A, C and E and the Limitations section.</p>
+      <p class="section-ref">Sections 2.2, 3.1, 3.3 and 4.2 to 4.4 of the paper, with Appendices A, C and E and the Limitations section.</p>
 
       <h3>Three design choices carry the signal.</h3>
-      <p>SRI uses internal activations, reads them from the last layer and keeps the whole trajectory over steps. Giving up any one of these lowers the mean AUROC, and a text-based signal stays near chance.</p>
+      <p>SRI uses internal activations, reads them from the last layer and keeps the whole trajectory over steps. Giving up any one of these lowers the mean AUROC, and a text-based signal reaches only 0.57 on average, with large variance across models.</p>
       <div class="chart-card">
                 <div class="chart-head">
                   <div class="chart-title">Ablation of the SRI design choices<small>Table 4 · mean AUROC across the six models</small></div>
@@ -404,7 +409,7 @@
       </div>
 
       <h3 class="deep">Jailbreak generations look different in SRI space.</h3>
-      <p class="deep">Harmless and refused generations produce smooth, low-variance trajectories, while jailbreak generations are volatile and often move toward refusal without converging, mostly under autoregressive sampling. Under Linear Discriminant Analysis the groups occupy distinct regions of SRI space, imperfectly separable yet stable enough for a detector.</p>
+      <p class="deep">Harmless and refused generations produce smooth, low-variance trajectories, while jailbreak generations are volatile and often move toward refusal without converging, mostly under autoregressive sampling. Under Linear Discriminant Analysis the groups occupy distinct regions of SRI space in most cases, imperfectly separable yet stable enough for a detector.</p>
       <div class="deep explorer" id="explorer">
               <div class="chart-head">
                 <div class="chart-title">Explore the SRI space, one model at a time<small>Figures 12 and 13 · left: SRI signal under a jailbreak prompt · right: LDA projection of the SRI space</small></div>
@@ -431,7 +436,7 @@
               </div>
             </div>
 
-      <h3 class="deep">The signal in one formula.</h3>
+      <h3 class="deep">How the score is computed.</h3>
       <div class="deep equation-block">
               <div class="equation">
                 <span class="eq-label">Cosine distances → calibrated log-ratio → SRI</span>
@@ -469,15 +474,15 @@
       <h3 class="deep">The guard holds under diffusion-specific attacks.</h3>
       <p class="deep">Under PAD and DIJA, two white-box attacks built for diffusion models, SRI Guard on LLaDA lowers Attack Success Rate from 0.53 to 0.29 and from 0.76 to 0.29, where DiffuGuard, a diffusion-specific defense, reaches 0.45 and 0.59 (Table 14). SRI Guard also assumes less, since DiffuGuard requires the original pre-manipulated prompt.</p>
 
-      <h3 class="deep">SRI Guard complements alignment training.</h3>
-      <p class="deep">SRI Guard relies on internal refusal signals, so it can miss a jailbreak when the model shows no hesitation toward refusal at any step. Its negligible overhead and independence from sampling make it a natural complement to other defenses, a combination the paper leaves to future work.</p>
+      <h3 class="deep">SRI Guard does not replace alignment training.</h3>
+      <p class="deep">SRI Guard is an inference-time detection mechanism and does not replace alignment training. It relies on internal refusal signals, so it can miss a jailbreak when the model shows no hesitation toward refusal at any step. Its negligible overhead and independence from sampling make it a natural complement to other defenses, a combination the paper leaves to future work.</p>
 
-      <h3 class="deep">Four directions follow from the results.</h3>
+      <h3 class="deep">Four questions the results leave open.</h3>
       <ul class="deep">
-        <li><strong>Other layers.</strong> Middle-layer SRI separates far better than first-layer SRI and slightly below the last layer, so intermediate layers are an open design choice (Section 4.4).</li>
-        <li><strong>Other model families.</strong> The hybrid model SDAR recovers and LLaDA-2 at 16B preserves the SRI geometry, so hybrid and larger models are natural next targets (Appendices A and E.4).</li>
+        <li><strong>Other layers.</strong> Middle-layer SRI separates substantially better than first-layer SRI and slightly below the last layer, and the last layer wins in four of six models, so the choice of layer could be revisited (Section 4.4 and Appendix E.1).</li>
+        <li><strong>Other model families.</strong> The hybrid model SDAR recovers and LLaDA-2 at 16B preserves the SRI geometry, which suggests hybrid and larger models as next targets (Appendices A and E.4).</li>
         <li><strong>Combined defenses.</strong> SRI Guard leaves sampling untouched and adds negligible overhead, so stacking it with other defenses is untested and open (Limitations).</li>
-        <li><strong>Black-box targets.</strong> SRI from a white-box surrogate (Dream, 7B) already defends a black-box LLaDA-2 (Table 24), so surrogate choice and transfer are open (Appendix E.6).</li>
+        <li><strong>Black-box targets.</strong> SRI from a white-box surrogate (Dream, 7B) already defends a black-box LLaDA-2 (Table 24), which leaves the choice of surrogate and the limits of transfer to future work (Appendix E.6).</li>
       </ul>
       <a href="https://arxiv.org/abs/2602.02600" class="article-closing-cta" target="_blank" rel="noopener">Read the paper on arXiv</a>
     </div>
