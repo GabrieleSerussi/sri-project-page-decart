@@ -673,7 +673,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 1200px) {
   .article-main { grid-template-columns: minmax(0, 1fr) 220px; gap: 40px; }
   .quick-links { width: 220px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  /* .stats-grid keeps four columns here; two columns start at 1000px (rule at the end of the sheet) */
   .tool-card-body { flex-basis: 440px; }
 }
 
@@ -1034,7 +1034,7 @@ button { font: inherit; color: inherit; }
   .flow { flex-wrap: wrap; gap: 12px; }
   .flow-step { flex: 1 1 calc(50% - 6px); }
   .flow-arrow { display: none; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  /* .stats-grid keeps four columns here; two columns start at 1000px (rule at the end of the sheet) */
   .tech-cards, .rq-cards { grid-template-columns: repeat(2, 1fr); }
   .explorer-grid { grid-template-columns: 1fr; }
 }
@@ -1083,4 +1083,70 @@ button { font: inherit; color: inherit; }
   .article-body h2 { font-size: 24px; }
   .text-block { margin-bottom: 40px; }
   .tldr-side h3 { font-size: 22px; }
+}
+
+/* ---- Defenses at a glance (SVG scatter, mean over models) ---- */
+.scatter svg { display: block; width: 100%; height: auto; }
+.scatter .grid { stroke: #E3E3E3; stroke-width: 1; }
+.scatter .grid.break { stroke-dasharray: 3 4; }
+.scatter .axis { stroke: var(--neutral-300); stroke-width: 1; }
+.scatter .tick { font-family: var(--font-body); font-size: 11px; fill: var(--neutral-400); font-variant-numeric: tabular-nums; }
+.scatter .axis-title { font-family: var(--font-body); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--neutral-500); }
+.scatter .hit { fill: transparent; }
+.scatter .pt { stroke: var(--surface-panel); stroke-width: 2; }
+.scatter .pt.is-ours { fill: var(--series-diffusion); }
+.scatter .pt.is-base { fill: var(--series-ar); }
+.scatter .pt.is-none { fill: #fff; stroke: var(--series-ar); stroke-width: 2; }
+.scatter .lbl { font-family: var(--font-body); font-size: 12.5px; fill: var(--neutral-800); }
+.scatter .lbl.is-ours { font-weight: 600; }
+.scatter g:focus-visible .pt, .scatter g:hover .pt { filter: brightness(1.1); }
+
+/* ---- Prominent action row in the "Use it" act ---- */
+.build-actions { margin: var(--space-lg) 0 var(--space-xl); }
+.build-actions .btn-pill { font-size: 16px; padding: 13px 22px; }
+.article-body .recipe { margin: 0 0 var(--space-xl); }
+.scatter svg.is-narrow .lbl { font-size: 15px; }
+.scatter svg.is-narrow .tick { font-size: 13px; }
+.scatter svg.is-narrow .axis-title { font-size: 12px; letter-spacing: 0.04em; }
+
+/* ============================================================
+   Reading aids for the simplified structure: a muted line under each
+   section heading pointing at the paper, and spacing between the
+   overview panel and the stat cards.
+   ============================================================ */
+.article-body .section-ref { font-size: 13px; line-height: 1.5; letter-spacing: 0.01em; color: var(--neutral-500); opacity: 1; margin: -4px 0 var(--space-lg); }
+.tldr + .stats-grid { margin-top: var(--space-2xl); }
+@media (max-width: 700px) {
+  .article-body .section-ref { margin: 0 0 14px; }
+  .tldr + .stats-grid { margin-top: 16px; }
+}
+
+/* ============================================================
+   Layout fixes (2026-09-06)
+   1. Overview panel: label above the thesis heading, both left-aligned,
+      instead of a label at the far left and a heading floating right.
+   2. Header: the cover is top-aligned with the title instead of being
+      centred, so it no longer sinks when the title column is tall.
+   3. Stat cards: four columns down to 1000px, then two.
+   4. Cover: reserve only the token rows the slots need at each width.
+   ============================================================ */
+.tldr-side { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+.tldr-side h3 { max-width: 940px; flex: none; }
+.article-header { align-items: flex-start; }
+.article-hero-demo { margin-top: 54px; }
+@media (max-width: 1060px) {
+  /* stacked header: the cover spans the full column instead of a 640px box on the left */
+  .article-hero-demo { margin-top: 0; max-width: none; }
+}
+@media (max-width: 1000px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .sim-tokens { min-height: 74px; }
+}
+@media (max-width: 560px) {
+  .sim-tokens { min-height: 112px; }
+}
+@media (max-width: 420px) {
+  .sim-tokens { min-height: 150px; }
 }

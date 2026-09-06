@@ -1,6 +1,6 @@
 # SRI Playground (Colab notebook)
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GabrieleSerussi/sri-project-page/blob/main/colab/sri_playground.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GabrieleSerussi/sri-project-page-decart/blob/main/colab/sri_playground.ipynb)
 
 
 `sri_playground.ipynb` accompanies the paper *Step-Wise Refusal Dynamics in Autoregressive and Diffusion Language Models* ([arXiv:2602.02600](https://arxiv.org/abs/2602.02600); official code at [ElironRahimi/sri-signal](https://github.com/ElironRahimi/sri-signal)). A reader types any prompt, the notebook generates a response with a language model of their choice, and an animated widget shows the tokens appearing step by step next to the Step-Wise Refusal Internal Dynamics (SRI) signal sigma_t of that generation, so the internal turn toward or away from refusal can be watched as it happens.
